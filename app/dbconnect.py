@@ -4,7 +4,8 @@ from app.dbconfig import settings
 from sqlalchemy.orm import declarative_base
 
 # Use async URL for normal operations
-engine = create_async_engine(settings.DB_URL)
+engine = create_async_engine(settings.DB_URL,
+                             connect_args={"statement_cache_size": 0}  )
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 Base = declarative_base()
