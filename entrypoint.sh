@@ -8,15 +8,26 @@ RETRY_DELAY=2
 echo "🚀 Starting application initialization..."
 
 wait_for_db() {
-    echo "🔍 Checking database connection to ${POSTGRES_USER}@auth_db:5432/${POSTGRES_DB}"
+    echo "🔍 Checking database connection to ${DB_USER}@${DB_HOST}:${DB_PORT}/${DB_NAME} with SSL..."
     for ((i=1; i<=MAX_RETRIES; i++)); do
-        if PGPASSWORD=$POSTGRES_PASSWORD psql -h auth_db -U $POSTGRES_USER -d $POSTGRES_DB -c '\q' >/dev/null 2>&1; then
+        echo "   (Attempt ${i}/${MAX_RETRIES})"
+        echo "PG password is: $DB_PASSWORD"
+
+        if PGPASSWORD="$DB_PASSWORD" psql \
+            -h "$DB_HOST" \
+            -p "$DB_PORT" \
+            -U "$DB_USER" \
+            -d "$DB_NAME" \
+            "sslmode=require" \
+            -c '\q' >/dev/null 2>&1; then
             echo "✅ Database connection established"
             return 0
         fi
-        echo "⌛ Database not ready (attempt ${i}/${MAX_RETRIES})..."
+
+        echo "⌛ Database not ready, retrying in ${RETRY_DELAY}s..."
         sleep $RETRY_DELAY
     done
+
     echo "❌ Failed to connect to database after ${MAX_RETRIES} attempts"
     return 1
 }
@@ -39,5 +50,4 @@ start_app() {
 
 # Main execution flow
 wait_for_db && run_migrations && start_app
-
 exit $?

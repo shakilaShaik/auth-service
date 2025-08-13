@@ -3,13 +3,14 @@ FROM python:3.10-slim
 WORKDIR /app
 ENV PYTHONPATH=/app
 
-# System dependencies (added postgresql-client for proper health checks)
+# System dependencies (added ca-certificates & postgresql-client for SSL)
 RUN apt-get update && \
     apt-get install -y \
     netcat-openbsd \
     build-essential \
     libpq-dev \
     postgresql-client \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Python deps
