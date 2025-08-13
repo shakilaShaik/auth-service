@@ -1,19 +1,18 @@
-import os
-from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, declarative_base
+from app.dbconfig import settings
 
-# Load .env for local dev only
-if os.getenv("RENDER") is None:
-    load_dotenv()
+engine = create_async_engine(
+    settings.DB_URL,
+    connect_args={"statement_cache_size": 0},  # Disable asyncpg prepared stmt cache
+    pool_pre_ping=True,                        # Avoid stale connections
+    pool_size=5,                               # Keep small pool size for Render
+    max_overflow=0
+)
 
-class Settings:
-    DB_URL = (
-        f"postgresql+asyncpg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
-        f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-        "?ssl=require"
-    )
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    ALGORITHM = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES = 15
-    REFRESH_TOKEN_EXPIRE_DAYS = 30
+SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+Base = declarative_base()
 
-settings = Settings()
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
