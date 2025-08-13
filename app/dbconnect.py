@@ -8,8 +8,7 @@ engine = create_async_engine(
     connect_args={"statement_cache_size": 0},  # Disable prepared stmt cache
     pool_size=5,      # Prevent too many connections
     max_overflow=0 ,
-    poolclass=None
-# No overflow beyond pool_size
+    pool_timeout=30,  # No overflow beyond pool_size
 )
 
 # Session factory
