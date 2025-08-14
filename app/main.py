@@ -18,7 +18,7 @@ frotnend_origin=os.getenv("ALLOWED_ORIGINS")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=   [frotnend_origin], 
+    allow_origins=   frotnend_origin, 
     allow_methods=["*"],
     allow_headers=["*"],
 )
