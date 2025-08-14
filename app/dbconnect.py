@@ -5,10 +5,8 @@ from app.dbconfig import settings  # no load_dotenv here
 # Create async engine with PgBouncer-safe config
 engine = create_async_engine(
     settings.DB_URL,
-    connect_args={"statement_cache_size": 0},  # Disable prepared stmt cache
-    pool_size=5,      # Prevent too many connections
-    max_overflow=0 ,
-    pool_timeout=30,  # No overflow beyond pool_size
+   echo=True,
+    pool_pre_ping=True 
 )
 
 # Session factory
