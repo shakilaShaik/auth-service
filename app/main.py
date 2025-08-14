@@ -4,7 +4,7 @@ from app.models import Base
 from app.dbconnect import engine
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-
+import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -14,14 +14,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Auth Service", lifespan=lifespan)
-
+frotnend_origin=os.getenv("ALLOWED_ORIGINS")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173"
-    ],  # Replace "*" with specific origins in production
-    allow_credentials=True,
+    allow_origins=   [frotnend_origin], 
     allow_methods=["*"],
     allow_headers=["*"],
 )
